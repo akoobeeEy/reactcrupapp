@@ -40,13 +40,15 @@ const StudentsPage = () => {
       title: "IsMarried",
       dataIndex: "isMarried",
       key: "isMarried",
-      render: (bool) => <p className="text-xl">{bool ? "😎" : "😔"}</p>,
+      render: (isMarried) => (
+        <p className="text-xl">{isMarried ? "😎" : "😔"}</p>
+      ),
     },
     {
       title: "IsWork",
       dataIndex: "isWork",
       key: "isWork",
-      render: (bool) => <p className="text-xl">{bool ? "😎" : "😔"}</p>,
+      render: (isWork) => <p className="text-xl">{isWork ? "😎" : "😔"}</p>,
     },
 
     {
@@ -98,7 +100,6 @@ const StudentsPage = () => {
 
   const {
     isModalOpen,
-    setIsModalOpen,
     loading,
     setLoading,
     selected,
@@ -110,6 +111,7 @@ const StudentsPage = () => {
     handleCancel,
     form,
     cancel,
+    setIsModalOpen,
   } = useContext(Context);
 
   const studentData = useCallback(async () => {
@@ -122,7 +124,7 @@ const StudentsPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [teacherId]);
+  }, [setSelected]);
 
   useEffect(() => {
     studentData();
@@ -131,24 +133,27 @@ const StudentsPage = () => {
   const handleOk = async () => {
     try {
       let values = await form.validateFields();
-      if (selected) {
-        await request.put(`teachers/${teacherId}/students/${selected}`, values);
+      if (selected === null) {
+        await request.post(
+          `teachers/${teacherId}/students`,
+          values
+        );
       } else {
-        await request.post(`teachers/${teacherId}/students${selected}`, values);
+        await request.put(`teachers/${teacherId}/students/${selected}`, values);
       }
-      form.resetFields();
       studentData();
       setIsModalOpen(false);
     } catch (err) {
-      message;
+      message(err);
     }
   };
 
   async function editStudent(id) {
-    let { data } = await request.get(`teachers/${teacherId}/students/${id}`);
-    form.setFieldsValue(data);
     setSelected(id);
-    showModal();
+    setIsModalOpen(true);
+    let { data } = await request.get(`teachers/${teacherId}/students/${id}`);
+
+    form.setFieldsValue(data);
   }
 
   async function studentDelete(id) {
@@ -162,7 +167,7 @@ const StudentsPage = () => {
         title={() => (
           <div className="flex items-center justify-between mb-10">
             <h1 className="text-2xl font-bold">
-              Teachers <span className="ml-3">{setStudents.length}</span>
+              Students <span className="ml-3"></span>
             </h1>
             <Input className="w-1/2 py-2 shadow-lg all-input shadow-blue-800" />
             <Button
@@ -190,6 +195,7 @@ const StudentsPage = () => {
         <Form
           initialValues={{
             isMarried: false,
+            isWork: true,
           }}
           name="modal"
           form={form}
@@ -241,6 +247,9 @@ const StudentsPage = () => {
             <Checkbox>Is married ?</Checkbox>
           </Form.Item>
         </Form>
+        <Form.Item valuePropName="checked" name="isWork">
+          <Checkbox>Is Work ?</Checkbox>
+        </Form.Item>
       </Modal>
     </Fragment>
   );

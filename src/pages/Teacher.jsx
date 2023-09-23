@@ -1,4 +1,4 @@
-import { Fragment, useContext, useEffect } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -97,10 +97,10 @@ const Teacher = () => {
       ),
     },
   ];
+  const [data, setData] = useState([]);
+
   const {
     setTeacherId,
-    data,
-    setData,
     setIsModalOpen,
     isModalOpen,
     form,
@@ -115,55 +115,53 @@ const Teacher = () => {
   } = useContext(Context);
 
   const navigate = useNavigate();
-  
-  async function teacherId(id) {
-    let { data } = await request.get(`teachers/${id}`);
-    setTeacherId(data.id);
-    navigate("/students");
-  }
+
   useEffect(() => {
     getData();
   }, []);
 
   async function getData() {
     try {
-      setLoading(true)
+      setLoading(true);
       let { data } = await request("teachers");
       setData(data);
     } catch (err) {
       message(err);
-    }finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   }
 
   const handleOk = async () => {
     try {
-      let values = await form.validateFields();
-      if (selected) {
-        await request.put(`teachers/${selected}`, values);
-      } else {
+      const values = await form.validateFields();
+      if (selected === null) {
         await request.post("teachers", values);
+      } else {
+        await request.put(`teachers/${selected}`, values);
       }
-      form.resetFields();
       getData();
       setIsModalOpen(false);
     } catch (err) {
       message(err);
     }
   };
-
+  async function teacherId(id) {
+    let { data } = await request.get(`teachers/${id}`);
+    setTeacherId(data.id);
+    navigate("/students");
+  }
   async function edit(id) {
+    setSelected(id);
+    setIsModalOpen(true);
     let { data } = await request.get(`teachers/${id}`);
     form.setFieldsValue(data);
-    setSelected(id);
-    showModal();
+    console.log(data);
   }
   async function teachDelete(id) {
     await request.delete(`teachers/${id}`);
-    console.log(data);
   }
-  
+
   return (
     <Fragment>
       <Table

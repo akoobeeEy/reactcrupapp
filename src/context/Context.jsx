@@ -10,12 +10,14 @@ const ContextFirst = ({ children }) => {
   const [teacherId, setTeacherId] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [data, setData] = useState([]);
   const [form] = Form.useForm();
 
   const showModal = () => {
+    setSelected(null);
+    form.resetFields();
     setIsModalOpen(true);
   };
+
   const handleCancel = () => {
     setIsModalOpen(false);
   };
@@ -34,8 +36,6 @@ const ContextFirst = ({ children }) => {
     setSelected,
     teacherId,
     setTeacherId,
-    data,
-    setData,
     confirm,
     cancel,
     form,
