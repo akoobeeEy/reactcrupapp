@@ -10,6 +10,7 @@ const ContextFirst = ({ children }) => {
   const [teacherId, setTeacherId] = useState();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [searchValue, setSearchValue] = useState("");
   const [form] = Form.useForm();
 
   const showModal = () => {
@@ -45,6 +46,8 @@ const ContextFirst = ({ children }) => {
     handleCancel,
     setStudents,
     students,
+    searchValue,
+    setSearchValue
   };
 
   return <Context.Provider value={state}>{children}</Context.Provider>;
