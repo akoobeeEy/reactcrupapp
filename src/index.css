@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer base{
+    .all-input{
+        @apply bg-slate-950 border-none text-white
+    }
+   
+}
