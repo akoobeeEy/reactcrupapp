@@ -1,4 +1,4 @@
-import { Fragment, useContext, useEffect } from "react";
+import { Fragment, useCallback, useContext, useEffect } from "react";
 import {
   Button,
   Checkbox,
@@ -82,7 +82,7 @@ const StudentsPage = () => {
               cancelText="No"
             >
               <Button
-                onClick={() => teachDelete(record.id)}
+                onClick={() => studentDelete(record.id)}
                 danger
                 type="primary"
                 className="duration-200 hover:-translate-y-1"
@@ -90,14 +90,6 @@ const StudentsPage = () => {
                 Delete
               </Button>
             </Popconfirm>
-
-            <Button
-              onClick={() => teacherId(record.id)}
-              className="text-black duration-200 bg-yellow-500 hover:-translate-y-1 hover:bg-yellow-500"
-              type="primary"
-            >
-              Students
-            </Button>
           </Space>
         </div>
       ),
@@ -120,21 +112,21 @@ const StudentsPage = () => {
     cancel,
   } = useContext(Context);
 
-  async function studentData() {
+  const studentData = useCallback(async () => {
+    setLoading(true);
     try {
       const { data } = await request.get(`teachers/${teacherId}/students`);
-      console.log(data);
       setStudents(data);
-    } catch (err) {
-      message(err);
+    } catch (error) {
+      console.log(error);
     } finally {
       setLoading(false);
     }
-  }
+  }, [teacherId]);
 
   useEffect(() => {
     studentData();
-  }, [studentData()]);
+  }, [studentData]);
 
   const handleOk = async () => {
     try {
@@ -148,7 +140,7 @@ const StudentsPage = () => {
       studentData();
       setIsModalOpen(false);
     } catch (err) {
-      message
+      message;
     }
   };
 
@@ -159,6 +151,10 @@ const StudentsPage = () => {
     showModal();
   }
 
+  async function studentDelete(id) {
+    await request.delete(`teachers/${teacherId}/students/${id}`);
+    studentData();
+  }
   return (
     <Fragment>
       <Table

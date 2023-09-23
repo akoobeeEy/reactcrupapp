@@ -123,7 +123,7 @@ const Teacher = () => {
   }
   useEffect(() => {
     getData();
-  }, [getData()]);
+  }, []);
 
   async function getData() {
     try {
